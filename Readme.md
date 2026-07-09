@@ -29,16 +29,6 @@ But here's the catch: nobody has an easy way to decide **where to put the camera
 - It is **not** affiliated with, commissioned by, or endorsed by any traffic camera company or Virginia government body. Any companies or programs referenced (e.g., Maryland's existing camera program) are mentioned only as public context, not as partners.
 - It is **not** a finished, production-ready tool. It's a first-pass analysis meant to demonstrate a proactive approach — a real deployment decision would still need proper traffic engineering review, community input, and legal process.
 
-## What's in this repo
-
-| File | What it's for |
-|---|---|
-| `Problem_statement.md` | The core problem this project addresses, and why it matters right now |
-| `BRD.md` | The business case — who this is for, what it needs to do, and how success is measured |
-| `PRD.md` | The product plan — requirements, data sources, and how it's meant to work |
-| `README.md` | This file — the plain-language overview |
-| *(analysis code and outputs — added as the project is built)* | The actual data pipeline, scoring, and map |
-
 ## Data sources
 
 All data used is public:
