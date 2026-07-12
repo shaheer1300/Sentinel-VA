@@ -1,0 +1,17 @@
+{
+  "test_only": true,
+  "description": "Minimal schema and rejection cases. Production configurations are prohibited from referencing this file.",
+  "crash_cases": [
+    {"case": "valid", "document_number": "fixture-1", "datetime": "2020-01-01T08:00:00", "latitude": 36.88, "longitude": -76.25},
+    {"case": "duplicate_id", "document_number": "fixture-1", "datetime": "2020-01-02T08:00:00", "latitude": 36.88, "longitude": -76.25},
+    {"case": "malformed_datetime", "document_number": "fixture-2", "datetime": "not-a-date", "latitude": 36.88, "longitude": -76.25},
+    {"case": "invalid_coordinate", "document_number": "fixture-3", "datetime": "2020-01-03T08:00:00", "latitude": null, "longitude": -76.25}
+  ],
+  "school_cases": [
+    {"case": "active_k12", "status": "open", "category": "Elementary school"},
+    {"case": "closed", "status": "closed", "category": "Middle school"},
+    {"case": "preschool", "status": "open", "category": "Preschool"}
+  ],
+  "adt_metadata": {"exceededTransferLimit": true}
+}
+

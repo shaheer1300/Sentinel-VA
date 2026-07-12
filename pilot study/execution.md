@@ -5,6 +5,18 @@
 **Status:** Execution plan; no pilot analysis has begun  
 **End state:** A reproducible Norfolk historical-prioritization analysis, presented through a reviewable web application with downloadable evidence and clear limitations.
 
+## Current execution status
+
+| Phase | Status | Evidence |
+|---|---|---|
+| Phase 0 — foundation | Complete | `outputs/runs/norfolk-pilot-20260712-p0-p3-v4/phase0/` |
+| Phase 1 — intake/baseline | Complete | `outputs/runs/norfolk-pilot-20260712-p0-p3-v4/phase1/` |
+| Phase 2 — cleaning/schools | Complete | `outputs/runs/norfolk-pilot-20260712-p0-p3-v4/phase2/` |
+| Phase 3 — locations/features | Complete | `outputs/runs/norfolk-pilot-20260712-p0-p3-v4/phase3/` |
+| Phases 4–7 | Not started | Scoring, validation, web application, and release remain gated. |
+
+Run `v4` is the authoritative Phase 0–3 evidence bundle. Earlier runs are retained and marked superseded because defensive review identified evidence/reporting controls that required fresh runs rather than in-place patches.
+
 ## 1. Operating Rules
 
 This plan converts the scientific controls in `Procedure.md` into implementation phases. The phases are sequential. I must not begin a phase until its predecessor's handoff criteria are satisfied, except for creating non-production scaffolding that cannot change data or results.
@@ -384,3 +396,18 @@ Complete this record at every phase boundary. A phase may not be marked complete
 ## 12. Definition of Done
 
 The pilot is complete only when all execution phases have passed their handoff criteria and the final static web application enables the public to inspect **what was analyzed, how the score was formed, what its limitations are, and which evidence supports each displayed location**. A visually polished map without a passing, reproducible, explainable data pipeline is not a completed Sentinel-VA pilot.
+
+## 13. Final Execution Record
+
+| Field | Final entry |
+|---|---|
+| Phase / run ID | Phases 0–7; `norfolk-pilot-20260713-release-v7` |
+| Owner / date | Project operator; July 13, 2026 |
+| Input checkpoint | Frozen, hash-verified crash, boundary, NCES school, configuration, and source-register artifacts recorded in the run manifest |
+| Deliverables | Phase handoffs, ranked locations, validation evidence, release manifest, public web build, release notes, and deployment report under `outputs/runs/norfolk-pilot-20260713-release-v7/` |
+| Test evidence | 15 Python tests passed; 5 web contract/build tests passed; clean-clone `npm ci && npm test` passed; production dependency audit reported 0 vulnerabilities; local and public browser QA passed |
+| Quality metrics | 41,714 eligible crashes; 1,609 cells; 74 NCES-reported K–12 schools; 100/100 lineage audit; Wilson 95% lower bound 96.3%; exact rerun passed |
+| Deviations / incidents | Temporal stability (0.573, 0.562) and grid sensitivity (Jaccard 0.25, 0.176) remained below threshold. The result was classified conditionally feasible and all operational claims were constrained accordingly. An initial high-density browser view was superseded by a default index threshold of 80, a 40-point cap, one shared canvas, and a 100-row visible table limit. |
+| Open risks | Ranking instability, incomplete exposure data, analytic grid effects, and school-point limitations remain explicit research risks; no abort criterion is open. |
+| Handoff decision | `DEGRADED` for scientific interpretation; `GO` for the bounded public research showcase. |
+| Public release | `https://sentinel-va-norfolk-pilot.abeer.chatgpt.site` |

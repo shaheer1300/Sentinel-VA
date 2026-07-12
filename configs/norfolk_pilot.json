@@ -1,0 +1,98 @@
+{
+  "project": "Sentinel-VA",
+  "study": "Norfolk pilot",
+  "production": true,
+  "study_start": "2016-01-01T00:00:00",
+  "study_end": "2025-12-31T23:59:59",
+  "source_crs": "EPSG:4326",
+  "analysis_crs": "EPSG:26918",
+  "approved_boundary": {
+    "input_id": "norfolk_boundary_2025",
+    "expected_geoid": "51710",
+    "geometry_crs": "EPSG:4326",
+    "inclusion_predicate": "covers"
+  },
+  "validation_envelope": {
+    "name": "Conservative Norfolk pilot coordinate-validation envelope",
+    "provenance": "Pre-registered from the documented Norfolk-only source inventory; this is a data-quality envelope, not a legal municipal boundary.",
+    "min_longitude": -76.35,
+    "max_longitude": -76.15,
+    "min_latitude": 36.80,
+    "max_latitude": 36.99
+  },
+  "location_unit": {
+    "type": "fixed_grid",
+    "cell_size_m": 250,
+    "assignment_threshold": 0.995,
+    "rationale": "Coordinates are available, but authoritative intersection topology is not. Fixed cells provide deterministic, complete pilot aggregation without claiming intersection identity.",
+    "limitations": "Cell boundaries are analytic proxies and are subject to the modifiable areal unit problem. They are not legal, roadway-engineering, or deployment units."
+  },
+  "sensitivity": {
+    "primary_cell_size_m": 250,
+    "alternative_cell_sizes_m": [200, 300],
+    "may_replace_primary_automatically": false
+  },
+  "random_seed": 20260712,
+  "exposure_enabled": false,
+  "school_input_ids": [
+    "nces_public_schools_2023_24",
+    "nces_private_schools_2023_24"
+  ],
+  "inputs": [
+    {
+      "id": "norfolk_crashes",
+      "path": "data/Norfolk/Traffic_Crashes.csv",
+      "format": "csv",
+      "source_owner": "City of Norfolk public crash-data source (already acquired)",
+      "acquisition_date": "2026-07-12",
+      "acquisition_method": "Repository-provided local snapshot",
+      "provenance_status": "public-source snapshot; source URL to be recorded before public release",
+      "license_status": "public-data terms require final publication review",
+      "known_limitations": "Crash observations are historical records, not violation observations or causal evidence."
+    },
+    {
+      "id": "nces_public_schools_2023_24",
+      "path": "data/Norfolk/NCES_Public_Schools_2023_24.csv",
+      "format": "csv",
+      "source_owner": "National Center for Education Statistics (NCES) EDGE",
+      "acquisition_date": "2026-07-13",
+      "acquisition_method": "Official ArcGIS Hub CSV distribution for Public School Locations 2023-24",
+      "provenance_status": "official federal public-school location dataset derived from the 2023-24 Common Core of Data",
+      "license_status": "public domain; Data.gov dataset states all information in the file is in the public domain",
+      "known_limitations": "Reported physical school points from 2023-24; not attendance boundaries, legal school zones, or current operating certification."
+    },
+    {
+      "id": "nces_private_schools_2023_24",
+      "path": "data/Norfolk/NCES_Private_Schools_2023_24.csv",
+      "format": "csv",
+      "source_owner": "National Center for Education Statistics (NCES) EDGE",
+      "acquisition_date": "2026-07-13",
+      "acquisition_method": "Official ArcGIS Hub CSV distribution for Private School Locations 2023-24",
+      "provenance_status": "official federal private-school location dataset derived from the 2023-24 Private School Survey",
+      "license_status": "public domain; Data.gov dataset states all information in the file is in the public domain",
+      "known_limitations": "Reported physical school points from 2023-24; not attendance boundaries, legal school zones, or current operating certification."
+    },
+    {
+      "id": "norfolk_boundary_2025",
+      "path": "data/Norfolk/Norfolk_Census_Boundary_2025.geojson",
+      "format": "geojson",
+      "source_owner": "U.S. Census Bureau TIGERweb",
+      "acquisition_date": "2026-07-12",
+      "acquisition_method": "TIGERweb State_County MapServer layer 1 query for GEOID 51710; output CRS EPSG:4326",
+      "provenance_status": "official public TIGERweb county-equivalent boundary; January 1, 2025 vintage",
+      "license_status": "U.S. Census Bureau public geographic data; retain Census attribution and technical limitations",
+      "known_limitations": "Governmental-unit boundary representation for validation; it is not a school-zone or roadway-engineering boundary."
+    },
+    {
+      "id": "norfolk_adt_transfer_limited",
+      "path": "data/Norfolk/Traffic Volums ADT.json",
+      "format": "geojson",
+      "source_owner": "VDOT traffic-volume service snapshot (already acquired)",
+      "acquisition_date": "2026-07-12",
+      "acquisition_method": "Repository-provided local snapshot",
+      "provenance_status": "public-source snapshot; service metadata retained in file",
+      "license_status": "public-data terms require final publication review",
+      "known_limitations": "Statewide export is transfer-limited and incomplete for Norfolk; prohibited as an exposure denominator."
+    }
+  ]
+}
