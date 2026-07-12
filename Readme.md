@@ -1,42 +1,79 @@
 # Sentinel-VA
 
-**Where should Virginia put its next traffic safety camera — before someone gets hurt, not after?**
+**Where should Norfolk look first for traffic-safety improvements before someone gets hurt?**
+
+## Current project status
+
+Sentinel-VA is currently in documentation and data-collection. No pilot analysis, risk score, ranking, or map has been started yet.
+
+The project will begin with a limited **Norfolk pilot study**. The pilot is a validation phase before the eventual Virginia-wide scope. It exists to test whether the data pipeline, location definition, school-proximity feature, and explainable scoring approach are workable in one city before the methodology is generalized statewide.
+
+See the [pilot study documentation](pilot%20study/Readme.md) for the current inventory, limitations, and readiness gates.
 
 ## What this project is
 
-On July 1, 2026, Virginia passed a law (SB84) allowing cities and counties to use AI-powered cameras to catch dangerous stop-sign and crosswalk violations, especially near schools. This is similar to programs already running in Maryland, where these cameras have cut violations by up to 70% in some towns.
+Sentinel-VA is a public-data analysis project for identifying and ranking locations that may deserve traffic-safety attention. It combines historical crash patterns, pedestrian and bicycle involvement, time patterns, and proximity to schools into an explainable prioritization score.
 
-But here's the catch: nobody has an easy way to decide **where to put the cameras first.** Right now, most towns only get attention after something bad has already happened — a serious crash, or worse, a child getting hurt near a school. That's backwards. The data to spot dangerous intersections *before* that happens already exists — it's just scattered across public crash reports and school records instead of being turned into something usable.
+The eventual project scope is statewide Virginia. Norfolk is the first pilot locality because its available crash data has coordinates, full timestamps, detailed injury information, and useful roadway attributes.
 
-**Sentinel-VA turns that public data into a ranked list and map of the intersections in Virginia most likely to need attention — using historical crash patterns, pedestrian risk, and school proximity, instead of waiting for the next headline.**
+## Project phases
 
-## What it's going to solve
+1. **Foundation and documentation** — define the problem, requirements, methodology, and limitations.
+2. **Norfolk pilot preparation** — document available data, resolve data-quality issues, choose the location unit, and confirm that the required inputs can be joined.
+3. **Norfolk pilot study** — build and validate a limited, explainable ranking and map. This phase has not started.
+4. **Statewide expansion** — generalize the validated methodology to Virginia when comparable statewide data is available and the project budget permits it.
 
-- **For a town or county:** a starting point for "where should we even be looking?" instead of starting from zero.
-- **For state officials:** evidence that this new law can be acted on thoughtfully and proactively, not just reactively.
-- **For anyone building or evaluating this kind of technology:** a clear, honest example of what proactive risk-scoring for traffic safety can look like when it's built from public data alone.
+## What the pilot is intended to solve
 
-## How it works (plain version)
+The pilot is intended to answer a narrow feasibility question:
 
-1. Pull public Virginia crash and pedestrian-incident records, plus public school locations.
-2. Look for patterns: which intersections have a history of pedestrian danger, which times of day are riskiest, and which locations are close to schools.
-3. Combine those patterns into a single, explainable risk score per location — not a black box. Every location on the ranked list comes with the reasons it ranked where it did.
-4. Show the results as a simple ranked list and an interactive map.
+> Can public or already-acquired data support a transparent Norfolk prioritization of crash locations using historical risk factors and proactive school proximity?
 
-## What this project is *not*
+The pilot is not intended to authorize, recommend, or implement a camera deployment.
 
-- It does **not** detect actual violations from camera footage. There's no video or image analysis here — this is entirely about spotting patterns in existing public safety data, not building the camera technology itself.
-- It is **not** affiliated with, commissioned by, or endorsed by any traffic camera company or Virginia government body. Any companies or programs referenced (e.g., Maryland's existing camera program) are mentioned only as public context, not as partners.
-- It is **not** a finished, production-ready tool. It's a first-pass analysis meant to demonstrate a proactive approach — a real deployment decision would still need proper traffic engineering review, community input, and legal process.
+## What the pilot will eventually examine
 
-## Data sources
+- Historical crash density and severity.
+- Pedestrian and bicycle involvement.
+- Fatalities and serious injuries.
+- Time-of-day and day-of-week patterns.
+- Proximity to active school locations.
+- Traffic exposure where a complete traffic-volume extract is available.
+- Spatial clusters or intersections, depending on the location unit selected during preparation.
 
-All data used is public:
-- Virginia crash and pedestrian-incident records (VDOT / Virginia DMV Traffic Crash Facts)
-- Virginia public school location data
+## Current data availability
 
-No proprietary, private, or vendor-owned data is used anywhere in this project.
+The current local inventory is documented from the files in `data/Norfolk/`:
+
+| File | Current contents | Status |
+|---|---|---|
+| `Traffic_Crashes.csv` | 42,004 unique crash records; January 2016–December 2025; coordinates, datetime, severity, injury, pedestrian, bicycle, roadway, and intersection fields | Suitable for preparation; analysis not started |
+| `School_information.csv` | 76 school-related POIs; 69 open and 7 closed; 39 elementary, 34 preschool, and 3 kindergarten records | Available, but includes early-childhood facilities and needs filtering |
+| `MiddleandHighschool_information.csv` | 26 POIs; 23 open and 3 closed; 14 middle schools, 9 high schools, and 3 K–12 schools | Fills the secondary-school gap; needs deduplication and validation |
+| `Traffic Volums ADT.json` | 2,000 GeoJSON line features from a statewide traffic-volume export | Incomplete: the file reports `exceededTransferLimit=true` and is not yet a complete Norfolk exposure layer |
+
+The two school files together contain 102 raw records, 92 marked open and 10 marked closed. All have names, coordinates, Norfolk locality values, and a `last_verified_date` of June 1, 2026. Two names occur at multiple coordinates; these should be retained as separate campuses unless validation shows that one is a legacy record.
+
+## Data constraints and budget limitations
+
+The project is limited to free public sources and data already acquired. It does not currently budget for paid traffic counts, proprietary mobility data, vendor citation data, field surveys, or professional traffic-engineering studies.
+
+The current ADT export is transfer-limited, so it cannot yet support a complete crash-rate denominator for Norfolk. The school files are third-party POI exports and their completeness, licensing, and public/private classification must be documented before final publication.
+
+These limitations mean that an eventual pilot score must be presented as an explainable prioritization aid or historical hotspot index—not as a guaranteed prediction of future crashes or a legal determination of camera eligibility.
+
+## What this project is not
+
+- It does not detect violations from camera footage.
+- It does not build a computer-vision system.
+- It does not recommend an actual camera installation without traffic engineering, legal review, community input, and local approval.
+- It is not affiliated with any camera company, vendor, city department, or state agency.
+- It is not yet a finished or production-ready system.
+
+## Eventual statewide scope
+
+After the Norfolk pilot is documented, validated, and reviewed, the methodology may be generalized to Virginia. Statewide expansion depends on obtaining comparable crash coordinates, timestamps, school locations, roadway geometry, and—ideally—traffic exposure data for other localities.
 
 ## About
 
-Built by Shaheer Ahmad as an independent analysis project exploring proactive, data-driven approaches to traffic safety technology rollout. If you have questions about the methodology or want to see the underlying analysis, reach out directly.
+Built by Shaheer Ahmad as an independent analysis project exploring proactive, explainable approaches to traffic safety prioritization.
