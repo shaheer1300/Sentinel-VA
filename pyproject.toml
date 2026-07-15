@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=65"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentinel-va"
+version = "0.1.0"
+description = "Deterministic Norfolk traffic-safety pilot pipeline"
+requires-python = ">=3.11"
+dependencies = [
+  "pandas==2.3.0",
+  "numpy==2.3.1",
+  "pyproj==3.7.1",
+  "shapely==2.1.1",
+  "scipy==1.16.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest==9.0.2"]
+
+[project.scripts]
+sentinel-pilot = "sentinel_va.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["src"]

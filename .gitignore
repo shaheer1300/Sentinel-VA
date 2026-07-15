@@ -162,3 +162,9 @@ out/
 
 # Data folder
 data/
+
+# outputs folder
+outputs/
+
+# The web application is maintained as a separate Git repository.
+/web/

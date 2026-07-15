@@ -1,129 +1,84 @@
 # Norfolk Pilot Study
 
 **Project:** Sentinel-VA  
-**Status:** Preparation and documentation only  
-**Scope:** City of Norfolk, Virginia  
-**Analysis status:** Not started
+**Status:** Execution Phases 0–7 complete  
+**Release run:** `norfolk-pilot-20260713-release-v7`  
+**Classification:** **Conditionally feasible; exploratory ranking**  
+**Public application:** [Sentinel-VA Norfolk pilot](https://sentinel-va-norfolk-pilot.abeer.chatgpt.site)
 
-## Purpose
+## Purpose and boundary
 
-The Norfolk pilot is a feasibility and validation phase before the eventual statewide Sentinel-VA project. Its purpose is to determine whether the currently available data can support a transparent, reproducible prioritization of traffic-safety locations using historical crashes and proactive proximity to schools.
+The Norfolk pilot tests whether public or already-acquired data can support a transparent, reproducible prioritization of traffic-safety locations using historical crashes, vulnerable-road-user evidence, time concentration, and proactive proximity to schools.
 
-The pilot is intentionally limited. It is not a camera-deployment recommendation, a legal eligibility determination, or a production traffic-safety system.
+The pilot is not a camera-deployment recommendation, legal eligibility determination, causal inference, crash-rate estimate, or production traffic-safety system. Its 250 m cells are reproducible analytic proxies rather than intersections, legal school zones, or deployment units.
 
-## Pilot scope
+## Completed result
 
-The eventual pilot analysis may include:
+| Result | Final value |
+|---|---:|
+| Source crash rows | 42,004 |
+| Eligible rows inside the approved Norfolk boundary | 41,714 |
+| Outside-boundary exclusions | 290 |
+| NCES-reported public/private K–12 facilities | 74 |
+| Candidate 250 m cells | 1,609 |
+| Eligible-record assignment rate | 100% |
+| Highest index | 89.6875 |
+| Lowest index | 21.6169 |
+| Exposure adjustment | Disabled; weight 0% |
+| Python tests | 15 passed, 0 failed |
+| Web tests | 5 passed, 0 failed |
 
-- Crash density and severity from Norfolk crash records.
-- Fatalities, serious injuries, pedestrian involvement, and bicycle involvement.
-- Time-of-day and day-of-week patterns.
-- Distance from candidate locations to active school facilities.
-- Traffic exposure if the ADT data can be re-extracted without transfer truncation.
-- Spatial clusters or intersection-like locations, depending on the location-unit decision.
+The approved geographic boundary is the U.S. Census Bureau TIGERweb January 1, 2025 county-equivalent boundary for Norfolk city (`GEOID 51710`). School proximity uses official NCES public-school 2023–24 and private-school current location datasets, replacing the superseded third-party POI inputs for the release run.
 
-The pilot will not include live camera footage, violation detection, proprietary citation data, paid mobility data, field observation, legal approval, procurement, or a statewide ranking.
+## Scoring method
 
-## Current data inventory
+The index is a deterministic weighted combination of percentile-normalized components:
 
-### `data/Norfolk/Traffic_Crashes.csv`
+| Component | Weight | Evidence |
+|---|---:|---|
+| Historical burden | 40% | Crash count with explicit fatality, suspected-serious-injury, and people-injured contributions |
+| Vulnerable road users | 25% | Pedestrian and bicycle crash evidence |
+| Time concentration | 15% | Concentration across time-of-day and day-of-week groups |
+| School proximity | 20% | Cell-centroid distance to the nearest reported NCES K–12 school |
+| Exposure | 0% | Not applied because the ADT export is transfer-limited |
 
-- 42,004 unique document numbers.
-- Date range: January 1, 2016 through December 31, 2025.
-- No missing values in the checked core fields: document number, datetime, route/street name, crash severity, fatalities, pedestrian fields, bicycle involvement, intersection type, latitude, or longitude.
-- 821 pedestrian-involved crashes.
-- 339 bicycle-involved crashes.
-- Contains coordinates, full datetime, severity, injury counts, roadway conditions, intersection type, traffic-control attributes, and behavioral/environmental indicators.
+All 1,609 published rows expose their component contributions and supporting explanation. The output is described as a historical priority index and never as an exposure-adjusted crash rate.
 
-This is the strongest current input for the pilot preparation phase.
+## Validation outcome
 
-### `data/Norfolk/School_information.csv`
+| Gate | Threshold | Observed result | Decision |
+|---|---:|---:|---|
+| Exact reproducibility | Identical rerun | Identical row-level scores | Pass |
+| Stratified lineage audit | Wilson 95% lower bound ≥ 95% | 100/100; lower bound 96.3% | Pass |
+| Temporal stability | Spearman ≥ 0.70 | 0.573 and 0.562 | Fail |
+| Grid sensitivity | Top-10 Jaccard ≥ 0.60 | 0.25 at 200 m; 0.176 at 300 m | Fail |
 
-- 76 records.
-- 69 marked `open`; 7 marked `closed`.
-- 39 elementary-school records.
-- 34 preschool records.
-- 3 kindergarten records.
-- No missing names or coordinates.
+No abort criterion was triggered. Because the two stability gates failed, the final classification is **conditionally feasible**: the pipeline and explanations are reproducible, but the exact ranking is not stable enough for operational selection.
 
-This file is useful for school proximity, but preschool and childcare-like facilities must be separated from K–12 schools before scoring.
+## Public application safeguards
 
-### `data/Norfolk/MiddleandHighschool_information.csv`
+The release application:
 
-The added file is currently CSV, not Excel, despite the original description.
+- displays the conditional classification persistently;
+- defaults to an index threshold of 80;
+- renders at most 40 points on one shared Leaflet canvas;
+- limits the visible table to 100 rows while retaining all 1,609 records in the downloadable release data;
+- supports search, deterministic sorting, reset, and row-to-detail inspection;
+- provides a complete tabular alternative to the map;
+- exposes score components, supporting values, limitations, and run metadata;
+- fails closed with an unavailable-state message if release data cannot be loaded; and
+- publishes reviewed CSV, JSON, and Markdown evidence downloads.
 
-- 26 records.
-- 23 marked `open`; 3 marked `closed`.
-- 14 middle-school records.
-- 9 high-school records.
-- 3 K–12-school records.
-- No missing names or coordinates.
+## Data limitations
 
-This file fills the middle- and high-school coverage gap identified in the original school file.
+- The crash record is historical and does not prove future risk or causation.
+- The transfer-limited ADT file is excluded from the score; no complete exposure denominator is available.
+- NCES points identify reported facilities, not attendance boundaries or legally defined school zones.
+- Grid geometry and cell size affect the precise ordering, as demonstrated by the failed sensitivity gate.
+- Statewide generalization is prohibited until comparable sources and locality-specific validation are completed.
 
-### Combined school inventory
+## Evidence and reproducibility
 
-The two school files contain 102 raw records, of which 92 are marked open and 10 are marked closed. All records are labelled with locality `Norfolk` and have `last_verified_date` equal to `2026-06-01`.
+The final audit trail is stored in `outputs/runs/norfolk-pilot-20260713-release-v7/`. Phase handoffs, hashes, validation tables, release notes, the deployment report, and the final manifest are bound to that immutable run ID.
 
-Two names appear at multiple coordinates:
-
-- James Blair middle school.
-- Little Creek Elementary School.
-
-These may represent relocated facilities, multiple campuses, or duplicate records. They should not be removed automatically; validation should determine whether each coordinate is a distinct active facility.
-
-The school files do not provide a reliable public/private field, enrollment, school hours, attendance boundaries, or legal school-zone polygons. School proximity can therefore be used as a proactive facility-proximity feature, but not as proof that a location is inside a legally defined school zone.
-
-### `data/Norfolk/Traffic Volums ADT.json`
-
-This file contains 2,000 GeoJSON line features and reports `exceededTransferLimit=true`. It is a statewide extract truncated at the service transfer limit, not a complete Norfolk traffic-volume dataset. Only four records in the current file contain an explicit Norfolk jurisdiction/route match.
-
-Before ADT is used as an exposure denominator, a Norfolk-filtered and paginated extraction must be obtained and verified. Until then, the pilot can calculate a historical hotspot index but should not claim a complete exposure-adjusted crash rate.
-
-The filename contains the typo `Volums`; preserve the current name in documentation unless the file is deliberately renamed and all references are updated.
-
-## Required preparation work
-
-The following work must be completed before pilot analysis begins:
-
-1. Combine the school files into one documented school inventory.
-2. Remove closed facilities from the primary proximity feature unless they are being retained for historical context.
-3. Classify records into elementary, middle, high, K–12, preschool, and kindergarten groups.
-4. Validate the two repeated school names and their separate coordinates.
-5. Document the provenance and licensing terms of the third-party school POI exports.
-6. Re-extract ADT traffic data with a Norfolk spatial or jurisdiction filter and pagination; confirm that transfer truncation is absent.
-7. Decide whether the analysis unit is a named intersection, a derived road intersection, a fixed grid, or a spatial crash cluster.
-8. Preserve a data-quality report before any risk score is calculated.
-
-## Pilot readiness gate
-
-The pilot study may begin only when:
-
-- The combined school inventory is validated.
-- Closed and non-K–12 facilities are handled explicitly.
-- The ADT data is either complete for Norfolk or excluded from the score with a documented limitation.
-- The location unit is defined and reproducible.
-- Core crash and school coordinates are confirmed to use compatible geographic coordinates.
-- Source provenance and licensing are recorded.
-- The score is framed as prioritization, not certainty or legal eligibility.
-
-## Budget and availability constraints
-
-The project currently relies on free public data and already acquired files. There is no budget assumption for commercial mobility feeds, vendor citation data, paid traffic counts, field surveys, or professional traffic-engineering review. Missing data must therefore be handled through transparent exclusions, documented proxies, or a later expansion phase—not silently filled with unsupported assumptions.
-
-## Expected pilot deliverables
-
-These deliverables belong to the future pilot-analysis phase and have not been created yet:
-
-- Data-quality report.
-- Combined and validated school-location layer.
-- Defined candidate-location layer or spatial clustering method.
-- Explainable feature table.
-- Norfolk pilot risk-prioritization score.
-- Ranked output with contributing factors.
-- Interactive map.
-- Limitations and validation notes.
-
-## Transition to the full project
-
-The statewide project should begin only after the Norfolk pilot demonstrates that the pipeline can ingest, join, score, explain, and visualize the available data without hidden data-quality or licensing problems. The statewide phase will require comparable data coverage across additional Virginia localities and a separate review of budget and source availability.
+Use [`Procedure.md`](Procedure.md) for the scientific procedure and [`execution.md`](execution.md) for the operational phase framework.

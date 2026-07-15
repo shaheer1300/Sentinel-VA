@@ -2,78 +2,65 @@
 
 **Where should Norfolk look first for traffic-safety improvements before someone gets hurt?**
 
-## Current project status
+Sentinel-VA is an independent public-data research project that ranks Norfolk, Virginia, analysis cells for further traffic-engineering review. The completed pilot is **conditionally feasible**: its data lineage and deterministic rerun gates passed, while its pre-registered temporal-stability and grid-sensitivity gates did not. The output is therefore exploratory and is not a camera-deployment recommendation, legal eligibility determination, causal model, or crash-rate estimate.
 
-Sentinel-VA is currently in documentation and data-collection. No pilot analysis, risk score, ranking, or map has been started yet.
+## Public pilot
 
-The project will begin with a limited **Norfolk pilot study**. The pilot is a validation phase before the eventual Virginia-wide scope. It exists to test whether the data pipeline, location definition, school-proximity feature, and explainable scoring approach are workable in one city before the methodology is generalized statewide.
+[Open the Sentinel-VA Norfolk pilot](https://sentinel-va-norfolk-pilot.abeer.chatgpt.site)
 
-See the [pilot study documentation](pilot%20study/Readme.md) for the current inventory, limitations, and readiness gates.
+The web application provides a memory-bounded interactive map, searchable and sortable ranked table, per-location score explanations, validation results, methodology, limitations, and downloadable evidence. Its default view uses a minimum index of 80 and renders no more than 40 points on one shared canvas.
 
-## What this project is
+## Final pilot result
 
-Sentinel-VA is a public-data analysis project for identifying and ranking locations that may deserve traffic-safety attention. It combines historical crash patterns, pedestrian and bicycle involvement, time patterns, and proximity to schools into an explainable prioritization score.
+| Measure | Result |
+|---|---:|
+| Release run | `norfolk-pilot-20260713-release-v7` |
+| Classification | Conditionally feasible; exploratory ranking |
+| Eligible Norfolk crash records | 41,714 |
+| Candidate 250 m cells | 1,609 |
+| NCES-reported K–12 schools | 74 |
+| Deterministic rerun | Passed |
+| Stratified lineage audit | 100 / 100 passed; Wilson 95% lower bound 96.3% |
+| Temporal stability | Failed; adjacent-period Spearman 0.57 and 0.56, required ≥ 0.70 |
+| Grid sensitivity | Failed; top-10 Jaccard 0.25 and 0.176, required ≥ 0.60 |
+| Exposure adjustment | Not applied; available ADT export is transfer-limited |
 
-The eventual project scope is statewide Virginia. Norfolk is the first pilot locality because its available crash data has coordinates, full timestamps, detailed injury information, and useful roadway attributes.
+## Method
 
-## Project phases
+The transparent index combines four percentile-based components:
 
-1. **Foundation and documentation** — define the problem, requirements, methodology, and limitations.
-2. **Norfolk pilot preparation** — document available data, resolve data-quality issues, choose the location unit, and confirm that the required inputs can be joined.
-3. **Norfolk pilot study** — build and validate a limited, explainable ranking and map. This phase has not started.
-4. **Statewide expansion** — generalize the validated methodology to Virginia when comparable statewide data is available and the project budget permits it.
+- 40% historical crash burden;
+- 25% pedestrian and bicycle evidence;
+- 15% time concentration; and
+- 20% proximity to NCES-reported public or private K–12 schools.
 
-## What the pilot is intended to solve
+Traffic exposure has a weight of 0% because the available ADT extract cannot support a complete denominator. Every published row includes its component contributions, supporting counts, nearest-school distance, explanation, limitation, and immutable run identifier.
 
-The pilot is intended to answer a narrow feasibility question:
+## Repository guide
 
-> Can public or already-acquired data support a transparent Norfolk prioritization of crash locations using historical risk factors and proactive school proximity?
+- [`pilot study/Procedure.md`](pilot%20study/Procedure.md) defines the scientific and defensive execution procedure.
+- [`pilot study/execution.md`](pilot%20study/execution.md) defines the phase tasks, tests, and handoff criteria.
+- [`pilot study/README.md`](pilot%20study/README.md) records the completed pilot outcome and limitations.
+- `src/sentinel_va/` contains the deterministic data, scoring, validation, and release pipeline.
+- `tests/` contains the Python quality gates.
+- `web/` contains the independently buildable showcase application and its web contract tests.
+- `outputs/runs/norfolk-pilot-20260713-release-v7/` contains the final audit trail and phase handoffs.
 
-The pilot is not intended to authorize, recommend, or implement a camera deployment.
+## Verification
 
-## What the pilot will eventually examine
+```powershell
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe -m pytest
+Set-Location web
+npm test
+```
 
-- Historical crash density and severity.
-- Pedestrian and bicycle involvement.
-- Fatalities and serious injuries.
-- Time-of-day and day-of-week patterns.
-- Proximity to active school locations.
-- Traffic exposure where a complete traffic-volume extract is available.
-- Spatial clusters or intersections, depending on the location unit selected during preparation.
+The final release gate is expected to report 15 passing Python tests and 5 passing web tests.
 
-## Current data availability
+## Scope boundary
 
-The current local inventory is documented from the files in `data/Norfolk/`:
-
-| File | Current contents | Status |
-|---|---|---|
-| `Traffic_Crashes.csv` | 42,004 unique crash records; January 2016–December 2025; coordinates, datetime, severity, injury, pedestrian, bicycle, roadway, and intersection fields | Suitable for preparation; analysis not started |
-| `School_information.csv` | 76 school-related POIs; 69 open and 7 closed; 39 elementary, 34 preschool, and 3 kindergarten records | Available, but includes early-childhood facilities and needs filtering |
-| `MiddleandHighschool_information.csv` | 26 POIs; 23 open and 3 closed; 14 middle schools, 9 high schools, and 3 K–12 schools | Fills the secondary-school gap; needs deduplication and validation |
-| `Traffic Volums ADT.json` | 2,000 GeoJSON line features from a statewide traffic-volume export | Incomplete: the file reports `exceededTransferLimit=true` and is not yet a complete Norfolk exposure layer |
-
-The two school files together contain 102 raw records, 92 marked open and 10 marked closed. All have names, coordinates, Norfolk locality values, and a `last_verified_date` of June 1, 2026. Two names occur at multiple coordinates; these should be retained as separate campuses unless validation shows that one is a legacy record.
-
-## Data constraints and budget limitations
-
-The project is limited to free public sources and data already acquired. It does not currently budget for paid traffic counts, proprietary mobility data, vendor citation data, field surveys, or professional traffic-engineering studies.
-
-The current ADT export is transfer-limited, so it cannot yet support a complete crash-rate denominator for Norfolk. The school files are third-party POI exports and their completeness, licensing, and public/private classification must be documented before final publication.
-
-These limitations mean that an eventual pilot score must be presented as an explainable prioritization aid or historical hotspot index—not as a guaranteed prediction of future crashes or a legal determination of camera eligibility.
-
-## What this project is not
-
-- It does not detect violations from camera footage.
-- It does not build a computer-vision system.
-- It does not recommend an actual camera installation without traffic engineering, legal review, community input, and local approval.
-- It is not affiliated with any camera company, vendor, city department, or state agency.
-- It is not yet a finished or production-ready system.
-
-## Eventual statewide scope
-
-After the Norfolk pilot is documented, validated, and reviewed, the methodology may be generalized to Virginia. Statewide expansion depends on obtaining comparable crash coordinates, timestamps, school locations, roadway geometry, and—ideally—traffic exposure data for other localities.
+The pilot does not detect violations, process camera footage, recommend enforcement sites, establish legally defined school zones, or replace traffic-engineering, legal, community, equity, procurement, or privacy review. Statewide expansion requires comparable statewide source coverage and a new validation cycle; the Norfolk result must not be generalized without that work.
 
 ## About
 
-Built by Shaheer Ahmad as an independent analysis project exploring proactive, explainable approaches to traffic safety prioritization.
+Built by Shaheer Ahmad as an independent analysis project exploring proactive, explainable approaches to traffic-safety prioritization.
